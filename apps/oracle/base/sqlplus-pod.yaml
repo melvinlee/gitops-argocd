@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sqlplus-client
+  labels:
+    app: sqlplus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sqlplus
+  template:
+    metadata:
+      labels:
+        app: sqlplus
+    spec:
+      containers:
+      - name: sqlplus
+        image: gvenzl/oracle-free:23
+        command: ["sleep", "infinity"]  # Keep container running
+      restartPolicy: Always

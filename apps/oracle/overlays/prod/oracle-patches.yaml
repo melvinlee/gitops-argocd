@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: oracle
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: oracle
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+        volumeMounts:
+        - name: oracle-data
+          mountPath: /opt/oracle/oradata
+      volumes:
+      - name: oracle-data
+        persistentVolumeClaim:
+          claimName: oracle-pvc

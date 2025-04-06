@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: oracle
+  namespace: argocd
+spec:
+  description: Oracle Database Project
+  sourceRepos:
+  - '*'  # You may want to restrict this to specific repositories
+  destinations:
+  - namespace: oracle-dev
+    server: https://kubernetes.default.svc
+  clusterResourceWhitelist: []
+  namespaceResourceBlacklist: []

@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: oracle-credentials
+type: Opaque
+stringData:
+  oracle-password: password
+  app-user: appuser
+  app-user-password: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oracle-headless
+  labels:
+    app: oracle
+spec:
+  ports:
+  - port: 1521
+    name: oracle
+  clusterIP: None
+  selector:
+    app: oracle
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oracle
+  labels:
+    app: oracle
+spec:
+  type: ClusterIP
+  ports:
+  - port: 1521
+    targetPort: 1521
+    name: oracle
+  selector:
+    app: oracle
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: oracle
+spec:
+  serviceName: oracle-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oracle
+  template:
+    metadata:
+      labels:
+        app: oracle
+    spec:
+      containers:
+      - name: oracle
+        image: gvenzl/oracle-free:23
+        ports:
+        - containerPort: 1521
+          name: oracle
+        env:
+        - name: ORACLE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: oracle-credentials
+              key: oracle-password
+        - name: APP_USER
+          valueFrom:
+            secretKeyRef:
+              name: oracle-credentials
+              key: app-user
+        - name: APP_USER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: oracle-credentials
+              key: app-user-password
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1"
+          limits:
+            memory: "4Gi"
+            cpu: "2"
+        volumeMounts:
+        - name: oracle-data
+          mountPath: /opt/oracle/oradata
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "healthcheck.sh"
+          initialDelaySeconds: 90
+          periodSeconds: 15
+          timeoutSeconds: 10
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "healthcheck.sh"
+          initialDelaySeconds: 300
+          periodSeconds: 30
+          timeoutSeconds: 10
+      volumes:
+      - name: oracle-data
+        emptyDir: {}

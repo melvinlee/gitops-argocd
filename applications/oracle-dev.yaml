@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: oracle-dev
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    environment: dev
+spec:
+  project: oracle
+  source:
+    repoURL: https://github.com/melvinlee/gitops-argocd.git 
+    targetRevision: HEAD
+    path: apps/oracle/overlays/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: oracle-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  revisionHistoryLimit: 3
