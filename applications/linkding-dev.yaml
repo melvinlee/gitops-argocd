@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: linkding-dev
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argoproj.io/finalizers
+  labels:
+    environment: dev
+spec:
+  project: linkding
+  source:
+    repoURL: https://github.com/melvinlee/gitops-argocd.git
+    targetRevision: HEAD
+    path: apps/linkding/overlays/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: linkding-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  revisionHistoryLimit: 3
