@@ -19,12 +19,14 @@ spec:
           limits:
             memory: "128Mi"
             cpu: "100m"
+        # Change the volume mount configuration for dev
+        volumeMounts: []
+      # Remove the volumes section for dev
+      volumes: []
 ---
+# Null patch to remove the PVC
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: linkding-data
-spec:
-  resources:
-    requests:
-      storage: 500Mi
+$patch: delete
