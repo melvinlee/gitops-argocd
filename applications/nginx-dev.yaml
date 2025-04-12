@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx-dev
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argoproj.io/finalizers
+  labels:
+    environment: dev
+spec:
+  project: nginx
+  source:
+    repoURL: https://github.com/melvinlee/gitops-argocd.git
+    targetRevision: HEAD
+    path: apps/nginx/overlays/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nginx-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  revisionHistoryLimit: 3
