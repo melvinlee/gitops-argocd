@@ -10,4 +10,5 @@ patchesStrategicMerge:
   - linkding-patches.yaml
 
 commonLabels:
-  environment: dev
+  environment: development
+  app: linkding
